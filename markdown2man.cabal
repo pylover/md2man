@@ -25,13 +25,14 @@ source-repository head
 
 library
   exposed-modules:
-      Lib
+      Markdown2Man
   other-modules:
       Paths_markdown2man
   hs-source-dirs:
       src
   build-depends:
       base >=4.7 && <5
+    , mtl
     , optparse-applicative
   default-language: Haskell2010
 
@@ -46,6 +47,7 @@ executable markdown2man-exe
   build-depends:
       base >=4.7 && <5
     , markdown2man
+    , mtl
     , optparse-applicative
   default-language: Haskell2010
 
@@ -60,5 +62,6 @@ test-suite markdown2man-test
   build-depends:
       base >=4.7 && <5
     , markdown2man
+    , mtl
     , optparse-applicative
   default-language: Haskell2010
