@@ -32,11 +32,13 @@ library
       src
   build-depends:
       base >=4.7 && <5
+    , optparse-applicative
   default-language: Haskell2010
 
 executable markdown2man-exe
   main-is: Main.hs
   other-modules:
+      CLI
       Paths_markdown2man
   hs-source-dirs:
       app
@@ -44,6 +46,7 @@ executable markdown2man-exe
   build-depends:
       base >=4.7 && <5
     , markdown2man
+    , optparse-applicative
   default-language: Haskell2010
 
 test-suite markdown2man-test
@@ -57,4 +60,5 @@ test-suite markdown2man-test
   build-depends:
       base >=4.7 && <5
     , markdown2man
+    , optparse-applicative
   default-language: Haskell2010

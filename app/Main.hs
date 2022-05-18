@@ -1,6 +1,11 @@
 module Main where
 
-import Lib
+
+import System.IO ()
+
+import CLI
+
 
 main :: IO ()
-main = someFunc
+main = do
+  parseArgs >>= print
