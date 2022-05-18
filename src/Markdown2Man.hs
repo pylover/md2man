@@ -6,6 +6,7 @@ module Markdown2Man
 import System.IO 
   ( Handle
   , hPutStr
+  , hPutStrLn
   , hGetLine
   , hIsEOF
   )
@@ -13,38 +14,38 @@ import Control.Monad.State
 
 
 data ConState = ConState 
-  { inFile :: Handle
-  , outFile :: Handle
+  { outFile :: Handle
   , lineNo :: Int
   }
   deriving (Eq, Show)
-type Convert a = StateT ConState IO a
+type ConvertT a = StateT ConState IO a
 
 
 loopLines :: Handle -> Handle -> IO ()
-loopLines i o = do
-  isClosed <- hIsEOF i
+loopLines i o = evalStateT (loopLines_ i) (ConState o 1)
+
+
+loopLines_ :: Handle -> ConvertT ()
+loopLines_ i = do
+  isClosed <- lift $ hIsEOF i
   if isClosed
     then return ()
-    else do
-      l <- hGetLine i
-      hPutStr o $ feedLine l
-      loopLines i o
+    else readLine >>= feedLine >> loopLines_ i
+  where
+    readLine = lift $ hGetLine i
 
 
--- loopLines :: Handle -> Handle -> IO ()
--- loopLines i o = do
---   isClosed <- hIsEOF i
---   if isClosed
---     then return ()
---     else do
---       l <- hGetLine i
---       hPutStr o $ feedLine l
---       loopLines i o
+out :: String -> ConvertT ()
+out s = gets outFile >>= lift . (\h -> hPutStr h s)
 
-     
-feedLine :: String -> String
-feedLine i = i ++ "\r\n"
+
+outLn :: String -> ConvertT ()
+outLn s = gets outFile >>= lift . (\h -> hPutStrLn h s)
+
+
+feedLine :: String -> ConvertT ()
+feedLine ('#':xs) = outLn xs
+feedLine xs = outLn xs
 
 
 -- .TH                Title
