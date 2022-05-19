@@ -4,13 +4,9 @@ module Markdown2Man
 
 
 import System.IO 
-  ( Handle
-  , hPutStr
-  , hPutStrLn
-  , hGetLine
-  , hIsEOF
-  )
 import Control.Monad.State
+
+import Helpers
 
 
 data ConState = ConState 
@@ -22,7 +18,7 @@ type ConvertT a = StateT ConState IO a
 
 
 loopLines :: Handle -> Handle -> IO ()
-loopLines i o = evalStateT (loopLines_ i) (ConState o 1)
+loopLines i o = evalStateT (loopLines_ i) (ConState o 0)
 
 
 loopLines_ :: Handle -> ConvertT ()
@@ -30,9 +26,13 @@ loopLines_ i = do
   isClosed <- lift $ hIsEOF i
   if isClosed
     then return ()
-    else readLine >>= feedLine >> loopLines_ i
+    else readLine >>= feedLine >> modify' nextLine >> loopLines_ i
   where
     readLine = lift $ hGetLine i
+
+
+nextLine :: ConState -> ConState
+nextLine (ConState o l) = ConState o (l + 1)
 
 
 out :: String -> ConvertT ()
@@ -44,7 +44,7 @@ outLn s = gets outFile >>= lift . (\h -> hPutStrLn h s)
 
 
 feedLine :: String -> ConvertT ()
-feedLine ('#':xs) = outLn xs
+feedLine ('#':xs) = outLn $ ".SH " ++ (upper (trim xs))
 feedLine xs = outLn xs
 
 

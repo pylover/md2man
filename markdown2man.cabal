@@ -25,6 +25,7 @@ source-repository head
 
 library
   exposed-modules:
+      Helpers
       Markdown2Man
   other-modules:
       Paths_markdown2man
