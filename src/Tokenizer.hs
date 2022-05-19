@@ -19,11 +19,8 @@ tokenize_ c (' ':xs) = c : tokenize_ "" xs
 tokenize_ c ('\'':xs) = c : decorate '\'' (reverse xq) : tokenize_ "" qs
   where (xq, (_:qs)) = break (=='\'') xs
 
--- ::: After
-tokenize_ c (':':':':':':xs) = c : (":::" : tokenize_ "" xs)
-
--- :: Pipe
-tokenize_ c (':':':':xs) = c : ("::" : tokenize_ "" xs)
+-- :: Header
+tokenize_ c ('#':xs) = c : ("#" : tokenize_ "" xs)
 
 -- Func | Literal
 tokenize_ c (x:xs) 

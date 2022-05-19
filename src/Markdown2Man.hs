@@ -7,6 +7,7 @@ import System.IO
 import Control.Monad.State
 
 import Helpers
+import Tokenizer
 
 
 data ConState = ConState 
@@ -26,7 +27,7 @@ loopLines_ i = do
   isClosed <- lift $ hIsEOF i
   if isClosed
     then return ()
-    else readLine >>= feedLine >> modify' nextLine >> loopLines_ i
+    else readLine >>= feedLine . tokenize >> modify' nextLine >> loopLines_ i
   where
     readLine = lift $ hGetLine i
 
@@ -43,9 +44,13 @@ outLn :: String -> ConvertT ()
 outLn s = gets outFile >>= lift . (\h -> hPutStrLn h s)
 
 
-feedLine :: String -> ConvertT ()
-feedLine ('#':xs) = outLn $ ".SH " ++ (upper (trim xs))
-feedLine xs = outLn xs
+outListLn :: [String] -> ConvertT ()
+outListLn = outLn . unwords
+
+
+feedLine :: [String] -> ConvertT ()
+feedLine ("#":xs) = outListLn $ ".SH " : (upper <$> xs)
+feedLine xs = outListLn xs
 
 
 -- .TH                Title
