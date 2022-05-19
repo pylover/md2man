@@ -48,5 +48,7 @@ tests:
     - -with-rtsopts=-N
     dependencies:
     - HTF
-    - process
+    - knob
+    - text
+    - bytestring
     - markdown2man
