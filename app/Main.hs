@@ -18,7 +18,7 @@ main = do
   Args ifn ofn <- parseArgs
   withFile_ ifn ReadMode 
     (\i -> withFile_ ofn WriteMode 
-      (\o -> loopLines i o))
+      (\o -> convert i o))
 
 
 withFile_ :: String -> IOMode -> (Handle -> IO r) -> IO r

@@ -39,20 +39,14 @@ executables:
     - markdown2man
 
 tests:
-  markdown2man-test:
-    main:                Spec.hs
+  test-convert:
+    main:                TestConvert
     source-dirs:         test
     ghc-options:
     - -threaded
     - -rtsopts
     - -with-rtsopts=-N
     dependencies:
+    - HTF
+    - process
     - markdown2man
-
-  test-tokenizer:
-    main:                TestTokenizer
-    other-modules:       TestTokenizer
-    source-dirs:         test
-    dependencies:
-      - HTF
-      - markdown2man

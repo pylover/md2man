@@ -1,5 +1,5 @@
 module Markdown2Man
-    ( loopLines
+    ( convert
     ) where
 
 
@@ -7,7 +7,6 @@ import System.IO
 import Control.Monad.State
 
 import Helpers
-import Tokenizer
 
 
 data ConState = ConState 
@@ -18,16 +17,16 @@ data ConState = ConState
 type ConvertT a = StateT ConState IO a
 
 
-loopLines :: Handle -> Handle -> IO ()
-loopLines i o = evalStateT (loopLines_ i) (ConState o 0)
+convert :: Handle -> Handle -> IO ()
+convert i o = evalStateT (loopLines i) (ConState o 0)
 
 
-loopLines_ :: Handle -> ConvertT ()
-loopLines_ i = do
+loopLines :: Handle -> ConvertT ()
+loopLines i = do
   isClosed <- lift $ hIsEOF i
   if isClosed
     then return ()
-    else readLine >>= feedLine . tokenize >> modify' nextLine >> loopLines_ i
+    else readLine >>= feedLine >> modify' nextLine >> loopLines i
   where
     readLine = lift $ hGetLine i
 
@@ -48,9 +47,16 @@ outListLn :: [String] -> ConvertT ()
 outListLn = outLn . unwords
 
 
-feedLine :: [String] -> ConvertT ()
-feedLine ("#":xs) = outListLn $ ".SH " : (upper <$> xs)
-feedLine xs = outListLn xs
+feedLine :: String -> ConvertT ()
+
+-- Section
+feedLine ('#':'#':xs) = outLn $ ".SH " ++ (upper . trim $ xs)
+
+-- Title
+feedLine ('#':xs) = outLn $ ".TH " ++ (upper . trim $ xs)
+
+
+feedLine xs = outLn xs
 
 
 -- .TH                Title

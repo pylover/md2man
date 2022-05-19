@@ -27,7 +27,6 @@ library
   exposed-modules:
       Helpers
       Markdown2Man
-      Tokenizer
   other-modules:
       Paths_markdown2man
   hs-source-dirs:
@@ -53,34 +52,19 @@ executable markdown2man-exe
     , optparse-applicative
   default-language: Haskell2010
 
-test-suite markdown2man-test
+test-suite test-convert
   type: exitcode-stdio-1.0
-  main-is: Spec.hs
+  main-is: TestConvert.hs
   other-modules:
-      TestTokenizer
       Paths_markdown2man
   hs-source-dirs:
       test
-  ghc-options: -threaded -rtsopts -with-rtsopts=-N
-  build-depends:
-      base >=4.7 && <5
-    , markdown2man
-    , mtl
-    , optparse-applicative
-  default-language: Haskell2010
-
-test-suite test-tokenizer
-  type: exitcode-stdio-1.0
-  main-is: TestTokenizer.hs
-  other-modules:
-      TestTokenizer
-  hs-source-dirs:
-      test
-  ghc-options: -main-is TestTokenizer
+  ghc-options: -threaded -rtsopts -with-rtsopts=-N -main-is TestConvert
   build-depends:
       HTF
     , base >=4.7 && <5
     , markdown2man
     , mtl
     , optparse-applicative
+    , process
   default-language: Haskell2010
