@@ -21,11 +21,8 @@ versionParser = infoOption (showVersion version)
 
 
 inputParser :: Parser FilePath
-inputParser = strOption
-  ( long "input"
- <> short 'i'
- <> value "-"
- <> metavar "FILENAME"
+inputParser = strArgument
+  ( metavar "FILENAME"
  <> help "Input file. otherwise standard input will be choosen.")
 
 

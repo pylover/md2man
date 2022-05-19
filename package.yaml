@@ -28,7 +28,7 @@ library:
   source-dirs: src
 
 executables:
-  markdown2man-exe:
+  md2man:
     main:                Main.hs
     source-dirs:         app
     ghc-options:
