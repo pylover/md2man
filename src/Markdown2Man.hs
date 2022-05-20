@@ -1,5 +1,6 @@
 module Markdown2Man
     ( convert
+    , Options(..)
     ) where
 
 
@@ -9,30 +10,26 @@ import Control.Monad.State
 import Helpers
 
 
+data Options = Options
+  { name :: String
+  , section :: Int
+  , author :: String
+  , email :: String
+  }
+  deriving (Eq, Show)
+
+
 data ConState = ConState 
-  { outFile :: Handle
+  { options :: Options
+  , outFile :: Handle
   , lineNo :: Int
   }
   deriving (Eq, Show)
 type ConvertT a = StateT ConState IO a
 
 
-convert :: Handle -> Handle -> IO ()
-convert i o = evalStateT (loopLines i) (ConState o 0)
-
-
-loopLines :: Handle -> ConvertT ()
-loopLines i = do
-  isClosed <- lift $ hIsEOF i
-  if isClosed
-    then return ()
-    else readLine >>= feedLine >> modify' nextLine >> loopLines i
-  where
-    readLine = lift $ hGetLine i
-
-
-nextLine :: ConState -> ConState
-nextLine (ConState o l) = ConState o (l + 1)
+convert :: Options -> Handle -> Handle -> IO ()
+convert opts i o = evalStateT (loopLines i) (ConState opts o 1)
 
 
 out :: String -> ConvertT ()
@@ -47,13 +44,34 @@ outListLn :: [String] -> ConvertT ()
 outListLn = outLn . unwords
 
 
+header :: ConvertT ()
+header = do
+  opts <- gets options
+  outLn $ ".\" Manpage for " ++ name opts  ++ "."
+  outLn $ ".\" Contact " ++ email opts ++ " to correct errors or typos."
+
+  
+loopLines :: Handle -> ConvertT ()
+loopLines i = do
+  isClosed <- lift $ hIsEOF i
+  if isClosed
+    then return ()
+    else readLine >>= feedLine >> modify' nextLine >> loopLines i
+  where
+    readLine = lift $ hGetLine i
+
+
+nextLine :: ConState -> ConState
+nextLine (ConState opts o l) = ConState opts o (l + 1)
+
+
 feedLine :: String -> ConvertT ()
 
 -- Section
 feedLine ('#':'#':xs) = outLn $ ".SH " ++ (upper . trim $ xs)
 
 -- Title
-feedLine ('#':xs) = outLn $ ".TH " ++ (upper . trim $ xs)
+feedLine ('#':xs) = outLn $ ".TH " ++ (upper . trim $ xs) ++ " " ++  show 1
 
 
 feedLine xs = outLn xs

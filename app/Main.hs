@@ -15,10 +15,12 @@ import Markdown2Man
 
 main :: IO ()
 main = do
-  Args ifn ofn <- parseArgs
+  Args ifn ofn appname section author email <- parseArgs
+  let options = Options appname section author email
+
   withFile_ ifn ReadMode 
     (\i -> withFile_ ofn WriteMode 
-      (\o -> convert i o))
+      (\o -> convert options i o))
 
 
 withFile_ :: String -> IOMode -> (Handle -> IO r) -> IO r

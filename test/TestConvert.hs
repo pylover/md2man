@@ -20,6 +20,9 @@ packStr :: String -> ByteString
 packStr = encodeUtf8 . T.pack
 
 
+defaultOptions = Options "foo" 1 "Alice" "alice@exmample.com"
+
+
 con :: String -> IO String
 con i = do
   iknob <- newKnob (packStr (i ++ "\n"))
@@ -28,7 +31,7 @@ con i = do
   oknob <- newKnob (pack [])
   oh <- newFileHandle oknob "bar" WriteMode
 
-  convert ih oh
+  convert defaultOptions ih oh
   hClose ih
   hClose oh
   bo <- Data.Knob.getContents oknob
@@ -41,8 +44,8 @@ test_convert = do
 
 
 test_convert_title = do
-  con "#foo" >>= assertEqual ".TH FOO"
-  con "# foo" >>= assertEqual ".TH FOO"
+  con "#foo" >>= assertEqual ".TH FOO 1"
+  con "# foo" >>= assertEqual ".TH FOO 1"
 
 
 test_convert_section = do
@@ -51,4 +54,4 @@ test_convert_section = do
 
 
 test_convert_full = do
-  con [r|#foo|] >>= assertEqual ".TH FOO"
+  con [r|#foo|] >>= assertEqual ".TH FOO 1"

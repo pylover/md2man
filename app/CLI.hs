@@ -10,6 +10,10 @@ import Paths_markdown2man(version)
 data Args = Args
   { input :: FilePath
   , output :: FilePath
+  , name :: String
+  , section :: Int
+  , author :: String
+  , email :: String
   }
   deriving Show
 
@@ -24,7 +28,9 @@ versionParser = infoOption (showVersion version)
 inputParser :: Parser FilePath
 inputParser = strArgument
   ( metavar "FILENAME"
- <> help "Input file. otherwise standard input will be choosen.")
+ <> value "-"
+ <> showDefaultWith (const "Standard Input")
+ <> help "Input file.")
 
 
 outputParser :: Parser FilePath
@@ -33,7 +39,41 @@ outputParser = strOption
  <> short 'o'
  <> metavar "FILENAME"
  <> value "-"
- <> help "Output filename, default: standard output")
+ <> showDefaultWith (const "Standard Output")
+ <> help "Output filename.")
+
+
+nameParser :: Parser String
+nameParser = strOption
+  ( long "name"
+ <> metavar "NAME"
+ <> help "The name for manual page."
+  )
+
+
+sectionParser :: Parser Int
+sectionParser = option auto 
+  ( long "section"
+ <> metavar "NUMBER"
+ <> showDefault
+ <> help "1-9, Unix manual section number. see `man man`."
+  )
+
+
+authorParser :: Parser String
+authorParser = strOption
+  ( long "author"
+ <> metavar "NAME"
+ <> help "Author name."
+  )
+
+
+emailParser :: Parser String
+emailParser = strOption
+  ( long "email"
+ <> metavar "EMAIL"
+ <> help "Author email address."
+  )
 
 
 appInfo :: InfoMod s
@@ -46,6 +86,10 @@ args :: Parser Args
 args = Args 
    <$> inputParser 
    <*> outputParser 
+   <*> nameParser
+   <*> sectionParser
+   <*> authorParser
+   <*> emailParser
 
 
 parseArgs :: IO Args
