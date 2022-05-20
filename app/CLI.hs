@@ -13,6 +13,7 @@ data Args = Args
   }
   deriving Show
 
+
 versionParser :: Parser (a -> a)
 versionParser = infoOption (showVersion version)
   (  long "version"

@@ -68,5 +68,6 @@ test-suite test-convert
     , markdown2man
     , mtl
     , optparse-applicative
+    , raw-strings-qq
     , text
   default-language: Haskell2010
