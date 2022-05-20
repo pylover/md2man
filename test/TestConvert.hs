@@ -1,5 +1,4 @@
 {-# OPTIONS_GHC -F -pgmF htfpp #-}
-{-# LANGUAGE QuasiQuotes #-}
 module TestConvert (htf_thisModulesTests, main) where
 
 import Markdown2Man
@@ -10,7 +9,6 @@ import qualified Data.Text as T
 import Data.ByteString (pack, ByteString)
 import Data.Text.Encoding (encodeUtf8, decodeUtf8)
 import Data.Knob
-import Text.RawString.QQ
 
 
 main = htfMain htf_thisModulesTests
@@ -54,4 +52,10 @@ test_convert_section = do
 
 
 test_convert_full = do
-  con [r|#foo|] >>= assertEqual ".TH FOO 1"
+  con "#foo\n\
+    \bar baz\n\
+    \## Qux\n\
+    \Qux is asesome." >>= assertEqual ".TH FOO 1\n\
+    \bar baz\n\
+    \.SH QUX\n\
+    \Qux is asesome."
