@@ -51,4 +51,5 @@ tests:
     - knob
     - text
     - bytestring
+    - raw-strings-qq
     - md2man

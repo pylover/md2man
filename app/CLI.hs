@@ -47,6 +47,7 @@ nameParser :: Parser String
 nameParser = strOption
   ( long "name"
  <> metavar "NAME"
+ <> value ""
  <> help "The name for manual page."
   )
 
@@ -56,6 +57,7 @@ sectionParser = option auto
   ( long "section"
  <> metavar "NUMBER"
  <> showDefault
+ <> value 1
  <> help "1-9, Unix manual section number. see `man man`."
   )
 
@@ -64,6 +66,7 @@ authorParser :: Parser String
 authorParser = strOption
   ( long "author"
  <> metavar "NAME"
+ <> value ""
  <> help "Author name."
   )
 
@@ -72,6 +75,7 @@ emailParser :: Parser String
 emailParser = strOption
   ( long "email"
  <> metavar "EMAIL"
+ <> value ""
  <> help "Author email address."
   )
 
