@@ -19,17 +19,22 @@ data Options = Options
   deriving (Eq, Show)
 
 
+data Status = Heading | Paragraph 
+  deriving (Eq, Show)
+
+
 data ConState = ConState 
   { options :: Options
   , outFile :: Handle
   , lineNo :: Int
+  , status :: Status
   }
   deriving (Eq, Show)
 type ConvertT a = StateT ConState IO a
 
 
 convert :: Options -> Handle -> Handle -> IO ()
-convert opts i o = evalStateT (loopLines i) (ConState opts o 1)
+convert opts i o = evalStateT (loopLines i) (ConState opts o 1 Heading)
 
 
 out :: String -> ConvertT ()
@@ -61,8 +66,13 @@ loopLines i = do
     readLine = lift $ hGetLine i
 
 
+newStatus :: Status -> ConvertT ()
+newStatus s = modify' $ newS
+  where newS (ConState opts o l _) = ConState opts o l s
+
+
 nextLine :: ConState -> ConState
-nextLine (ConState opts o l) = ConState opts o (l + 1)
+nextLine (ConState opts o l s) = ConState opts o (l + 1) s
 
 
 feedLine :: String -> ConvertT ()
@@ -73,8 +83,15 @@ feedLine ('#':'#':xs) = outLn $ ".SH " ++ (upper . trim $ xs)
 -- Title
 feedLine ('#':xs) = outLn $ ".TH " ++ (upper . trim $ xs) ++ " " ++  show 1
 
+-- Empty line
+feedLine "" = do
+  s <- gets status
+  case s of 
+    Paragraph -> outLn ".PP" >> newStatus Heading
+    _ -> return ()
 
-feedLine xs = outLn xs
+
+feedLine xs = outLn xs >> newStatus Paragraph
 
 
 -- .TH                Title

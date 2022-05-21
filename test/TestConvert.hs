@@ -23,7 +23,7 @@ defaultOptions = Options "foo" 1 "Alice" "alice@exmample.com"
 
 con :: String -> IO String
 con i = do
-  iknob <- newKnob (packStr (i ++ "\n"))
+  iknob <- newKnob (packStr (i))
   ih <- newFileHandle iknob "foo" ReadMode
   
   oknob <- newKnob (pack [])
@@ -33,22 +33,46 @@ con i = do
   hClose ih
   hClose oh
   bo <- Data.Knob.getContents oknob
-  return $ init ( T.unpack (decodeUtf8 bo))
+  return $ T.unpack (decodeUtf8 bo)
 
 
 test_convert = do
   con "" >>= assertEqual ""
-  con "\n" >>= assertEqual "\n"
+  con "\n" >>= assertEqual ""
 
 
 test_convert_title = do
-  con "#foo" >>= assertEqual ".TH FOO 1"
-  con "# foo" >>= assertEqual ".TH FOO 1"
+  con "#foo" >>= assertEqual ".TH FOO 1\n"
+  con "# foo" >>= assertEqual ".TH FOO 1\n"
 
 
 test_convert_section = do
-  con "##foo" >>= assertEqual ".SH FOO"
-  con "## foo" >>= assertEqual ".SH FOO"
+  con "##foo" >>= assertEqual ".SH FOO\n"
+  con "## foo" >>= assertEqual ".SH FOO\n"
+
+
+test_convert_paragraph = do
+  con "#foo\n\
+    \\n\
+    \\n" >>= assertEqual ".TH FOO 1\n"
+
+  con "#foo\n\
+    \bar baz\n\
+    \\n\
+    \qux quux\n">>= assertEqual ".TH FOO 1\n\
+    \bar baz\n\
+    \.PP\n\
+    \qux quux\n"
+
+  con "#foo\n\
+    \bar baz\n\
+    \\n\
+    \\n\
+    \\n\
+    \qux quux\n">>= assertEqual ".TH FOO 1\n\
+    \bar baz\n\
+    \.PP\n\
+    \qux quux\n"
 
 
 test_convert_full = do
@@ -58,4 +82,4 @@ test_convert_full = do
     \Qux is asesome." >>= assertEqual ".TH FOO 1\n\
     \bar baz\n\
     \.SH QUX\n\
-    \Qux is asesome."
+    \Qux is asesome.\n"
