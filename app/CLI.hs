@@ -4,7 +4,7 @@ module CLI (Args(..), parseArgs) where
 import Data.Version (showVersion)
 import Options.Applicative
 
-import Paths_markdown2man(version)
+import Paths_md2man(version)
 
 
 data Args = Args

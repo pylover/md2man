@@ -1,4 +1,4 @@
-module Markdown2Man
+module MD2Man
     ( convert
     , Options(..)
     ) where

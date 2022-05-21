@@ -1,1 +1,1 @@
-# markdown2man
+# md2man

@@ -1,6 +1,6 @@
-name:                markdown2man
+name:                md2man
 version:             0.1.0.0
-github:              "githubuser/markdown2man"
+github:              "githubuser/md2man"
 license:             BSD3
 author:              "Author name here"
 maintainer:          "example@example.com"
@@ -17,7 +17,7 @@ extra-source-files:
 # To avoid duplicated efforts in documentation and dealing with the
 # complications of embedding Haddock markup inside cabal files, it is
 # common to point users to the README.md file.
-description:         Please see the README on GitHub at <https://github.com/githubuser/markdown2man#readme>
+description:         Please see the README on GitHub at <https://github.com/githubuser/md2man#readme>
 
 dependencies:
 - base >= 4.7 && < 5
@@ -36,7 +36,7 @@ executables:
     - -rtsopts
     - -with-rtsopts=-N
     dependencies:
-    - markdown2man
+    - md2man
 
 tests:
   test-convert:
@@ -51,4 +51,4 @@ tests:
     - knob
     - text
     - bytestring
-    - markdown2man
+    - md2man

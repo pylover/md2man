@@ -1,3 +1,3 @@
-# Changelog for markdown2man
+# Changelog for md2man
 
 ## Unreleased changes

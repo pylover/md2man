@@ -1,7 +1,7 @@
 {-# OPTIONS_GHC -F -pgmF htfpp #-}
 module TestConvert (htf_thisModulesTests, main) where
 
-import Markdown2Man
+import MD2Man
 
 import Test.Framework
 import System.IO (IOMode(..), hClose)

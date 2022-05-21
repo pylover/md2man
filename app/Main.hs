@@ -10,7 +10,7 @@ import System.IO
   )
 
 import CLI
-import Markdown2Man
+import MD2Man
 
 
 main :: IO ()
