@@ -75,6 +75,17 @@ test_convert_paragraph = do
     \qux quux\n"
 
 
+test_convert_bold = do
+  con "#foo\n\
+    \** bar **\n" >>= assertEqual ".TH FOO 1\n\
+    \\\fB bar \\fR\n"
+
+  con "#foo\n\
+    \** bar\n\
+    \ baz **\n" >>= assertEqual ".TH FOO 1\n\
+    \\\fB bar\n\
+    \ baz \\fR\n"
+
 test_convert_full = do
   con "#foo\n\
     \bar baz\n\

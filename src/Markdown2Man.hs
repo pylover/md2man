@@ -19,7 +19,7 @@ data Options = Options
   deriving (Eq, Show)
 
 
-data Status = Heading | Paragraph 
+data Status = Heading | Normal | Bold
   deriving (Eq, Show)
 
 
@@ -35,6 +35,10 @@ type ConvertT a = StateT ConState IO a
 
 convert :: Options -> Handle -> Handle -> IO ()
 convert opts i o = evalStateT (loopLines i) (ConState opts o 1 Heading)
+
+
+outChr :: Char -> ConvertT ()
+outChr s = gets outFile >>= lift . (\h -> hPutChar h s)
 
 
 out :: String -> ConvertT ()
@@ -78,21 +82,46 @@ nextLine (ConState opts o l s) = ConState opts o (l + 1) s
 feedLine :: String -> ConvertT ()
 
 -- Section
-feedLine ('#':'#':xs) = outLn $ ".SH " ++ (upper . trim $ xs)
+feedLine ('#':'#':xs) = do
+  outLn $ ".SH " ++ (upper . trim $ xs)
+  newStatus Heading
 
 -- Title
-feedLine ('#':xs) = outLn $ ".TH " ++ (upper . trim $ xs) ++ " " ++  show 1
+feedLine ('#':xs) = do
+  outLn $ ".TH " ++ (upper . trim $ xs) ++ " " ++  show 1
+  newStatus Heading
 
 -- Empty line
 feedLine "" = do
   s <- gets status
   case s of 
-    Paragraph -> outLn ".PP" >> newStatus Heading
-    _ -> return ()
+    Heading -> return ()
+    _ -> outLn ".PP" >> newStatus Heading
+
+-- Normal text
+feedLine xs = do
+  s <- gets status
+  ifthen (s == Heading) $ newStatus Normal
+  processLine xs
+  -- if s == Heading 
+  --   then newStatus Normal >> processLine xs
+  --   else processLine xs
 
 
-feedLine xs = outLn xs >> newStatus Paragraph
+ifthen :: Bool -> ConvertT () -> ConvertT ()
+ifthen True x = x
+ifthen False _ = return ()
 
+
+processLine :: String -> ConvertT ()
+processLine [] = outLn "" 
+processLine ('*':'*':xs) = do 
+  s <- gets status
+  case s of
+    Bold -> out "\\fR"
+    _ -> out "\\fB" >> newStatus Bold
+  processLine xs
+processLine (x:xs) = outChr x >> processLine xs
 
 -- .TH                Title
 -- .HS NAME           Name
