@@ -86,6 +86,13 @@ test_convert_bold = do
     \\\fB bar\n\
     \ baz \\fR\n"
 
+
+test_convert_italic = do
+  con "#foo\n\
+    \* bar *\n" >>= assertEqual ".TH FOO 1\n\
+    \\\fI bar \\fR\n"
+
+
 test_convert_full = do
   con "#foo\n\
     \bar baz\n\

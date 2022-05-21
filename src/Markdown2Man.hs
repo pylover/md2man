@@ -19,7 +19,7 @@ data Options = Options
   deriving (Eq, Show)
 
 
-data Status = Heading | Normal | Bold
+data Status = Heading | Normal | Bold | Italic
   deriving (Eq, Show)
 
 
@@ -121,6 +121,13 @@ processLine ('*':'*':xs) = do
     Bold -> out "\\fR"
     _ -> out "\\fB" >> newStatus Bold
   processLine xs
+processLine ('*':xs) = do 
+  s <- gets status
+  case s of
+    Italic -> out "\\fR"
+    _ -> out "\\fI" >> newStatus Italic
+  processLine xs
+
 processLine (x:xs) = outChr x >> processLine xs
 
 -- .TH                Title
