@@ -101,10 +101,20 @@ test_convert_full = do
     \#foo\n\
     \bar baz\n\
     \## Qux\n\
-    \Qux is asesome" >>= assertEqual "\
+    \Qux is asesome\n\
+    \```bash\n\
+    \void main() {\n\
+    \  printf(\"Hello\"\n\
+    \}\n\
+    \```" >>= assertEqual "\
     \.TH FOO 1\n\
     \bar baz\n\
     \.SH QUX\n\
     \Qux is asesome\n\
+    \.EX\n\
+    \void main() {\n\
+    \  printf(\"Hello\"\n\
+    \}\n\
+    \.EE\n\
     \.SH AUTHOR\n\
     \Alice (alice@exmample.com)\n"

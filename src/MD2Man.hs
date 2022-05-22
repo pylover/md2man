@@ -19,7 +19,7 @@ data Options = Options
   deriving (Eq, Show)
 
 
-data Status = Heading | Normal | Bold | Italic
+data Status = Heading | Normal | Bold | Italic | Code
   deriving (Eq, Show)
 
 
@@ -93,6 +93,13 @@ nextLine (ConState opts o l s) = ConState opts o (l + 1) s
 
 
 feedLine :: String -> ConvertT ()
+
+-- Code
+feedLine ('`':'`':'`':xs) = do
+  s <- gets status
+  case s of 
+    Code -> outLn ".EE" >> newStatus Normal
+    _ -> outLn ".EX" >> newStatus Code
 
 -- Section
 feedLine ('#':'#':xs) = do
