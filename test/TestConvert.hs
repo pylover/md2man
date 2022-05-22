@@ -1,5 +1,4 @@
 {-# OPTIONS_GHC -F -pgmF htfpp #-}
-{-# LANGUAGE QuasiQuotes #-}
 module TestConvert (htf_thisModulesTests, main) where
 
 import MD2Man
@@ -10,7 +9,6 @@ import qualified Data.Text as T
 import Data.ByteString (pack, ByteString)
 import Data.Text.Encoding (encodeUtf8, decodeUtf8)
 import Data.Knob
-import Text.RawString.QQ
 
 
 main = htfMain htf_thisModulesTests
@@ -20,45 +18,50 @@ packStr :: String -> ByteString
 packStr = encodeUtf8 . T.pack
 
 
-defaultOptions = Options "foo" 1 "Alice" "alice@exmample.com"
+minimalOptions = Options 1 "" ""
+fullOptions = Options 1 "Alice" "alice@exmample.com"
 
 
-con :: String -> IO String
-con i = do
+con :: Options -> String -> IO String
+con opts i = do
   iknob <- newKnob (packStr (i))
   ih <- newFileHandle iknob "foo" ReadMode
   
   oknob <- newKnob (pack [])
   oh <- newFileHandle oknob "bar" WriteMode
 
-  convert defaultOptions ih oh
+  convert opts ih oh
   hClose ih
   hClose oh
   bo <- Data.Knob.getContents oknob
   return $ T.unpack (decodeUtf8 bo)
 
 
+mini = con minimalOptions
+full = con fullOptions
+
+
 test_convert = do
-  con "" >>= assertEqual ""
-  con "\n" >>= assertEqual ""
+  mini "" >>= assertEqual ""
+  mini "\n" >>= assertEqual ""
 
 
 test_convert_title = do
-  con "#foo" >>= assertEqual ".TH FOO 1\n"
-  con "# foo" >>= assertEqual ".TH FOO 1\n"
+  mini "#foo" >>= assertEqual ".TH FOO 1\n"
+  mini "# foo" >>= assertEqual ".TH FOO 1\n"
 
 
 test_convert_section = do
-  con "##foo" >>= assertEqual ".SH FOO\n"
-  con "## foo" >>= assertEqual ".SH FOO\n"
+  mini "##foo" >>= assertEqual ".SH FOO\n"
+  mini "## foo" >>= assertEqual ".SH FOO\n"
 
 
 test_convert_paragraph = do
-  con "#foo\n\
+  mini "#foo\n\
     \\n\
     \\n" >>= assertEqual ".TH FOO 1\n"
 
-  con "#foo\n\
+  mini "#foo\n\
     \bar baz\n\
     \\n\
     \qux quux\n">>= assertEqual ".TH FOO 1\n\
@@ -66,7 +69,7 @@ test_convert_paragraph = do
     \.PP\n\
     \qux quux\n"
 
-  con "#foo\n\
+  mini "#foo\n\
     \bar baz\n\
     \\n\
     \\n\
@@ -78,11 +81,11 @@ test_convert_paragraph = do
 
 
 test_convert_bold = do
-  con "#foo\n\
+  mini "#foo\n\
     \** bar **\n" >>= assertEqual ".TH FOO 1\n\
     \\\fB bar \\fR\n"
 
-  con "#foo\n\
+  mini "#foo\n\
     \** bar\n\
     \ baz **\n" >>= assertEqual ".TH FOO 1\n\
     \\\fB bar\n\
@@ -90,18 +93,18 @@ test_convert_bold = do
 
 
 test_convert_italic = do
-  con [r|#foo
-* bar *
-|] >>= assertEqual [r|.TH FOO 1
-\fI bar \fR
-|]
+  mini "* bar *" >>= assertEqual "\\fI bar \\fR\n"
 
 
 test_convert_full = do
-  con "#foo\n\
+  full "\
+    \#foo\n\
     \bar baz\n\
     \## Qux\n\
-    \Qux is asesome." >>= assertEqual ".TH FOO 1\n\
+    \Qux is asesome" >>= assertEqual "\
+    \.TH FOO 1\n\
     \bar baz\n\
     \.SH QUX\n\
-    \Qux is asesome.\n"
+    \Qux is asesome\n\
+    \.SH AUTHOR\n\
+    \Alice\n"

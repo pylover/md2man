@@ -4,6 +4,7 @@ module MD2Man
     ) where
 
 
+import Debug.Trace
 import System.IO 
 import Control.Monad.State
 
@@ -11,8 +12,7 @@ import Helpers
 
 
 data Options = Options
-  { name :: String
-  , section :: Int
+  { section :: Int
   , author :: String
   , email :: String
   }
@@ -33,10 +33,6 @@ data ConState = ConState
 type ConvertT a = StateT ConState IO a
 
 
-convert :: Options -> Handle -> Handle -> IO ()
-convert opts i o = evalStateT (loopLines i) (ConState opts o 1 Heading)
-
-
 outChr :: Char -> ConvertT ()
 outChr s = gets outFile >>= lift . (\h -> hPutChar h s)
 
@@ -49,17 +45,32 @@ outLn :: String -> ConvertT ()
 outLn s = gets outFile >>= lift . (\h -> hPutStrLn h s)
 
 
-outListLn :: [String] -> ConvertT ()
-outListLn = outLn . unwords
+ifthen :: Bool -> ConvertT () -> ConvertT ()
+ifthen True x = x
+ifthen False _ = return ()
 
 
-header :: ConvertT ()
-header = do
+convert :: Options -> Handle -> Handle -> IO ()
+convert opts i o = evalStateT (render i) (ConState opts o 1 Heading)
+
+
+render :: Handle -> ConvertT ()
+render i = do
+  loopLines i
+  footer
+
+
+footer :: ConvertT ()
+footer = do
   opts <- gets options
-  outLn $ ".\" Manpage for " ++ name opts  ++ "."
-  outLn $ ".\" Contact " ++ email opts ++ " to correct errors or typos."
+  printAuthor $ author opts
 
-  
+
+printAuthor :: String -> ConvertT ()
+printAuthor "" = trace "empty author" $ return ()
+printAuthor a = trace ("author: " ++ a) $ outLn (".SH AUTHOR\n" ++ a)
+ 
+
 loopLines :: Handle -> ConvertT ()
 loopLines i = do
   isClosed <- lift $ hIsEOF i
@@ -103,14 +114,6 @@ feedLine xs = do
   s <- gets status
   ifthen (s == Heading) $ newStatus Normal
   processLine xs
-  -- if s == Heading 
-  --   then newStatus Normal >> processLine xs
-  --   else processLine xs
-
-
-ifthen :: Bool -> ConvertT () -> ConvertT ()
-ifthen True x = x
-ifthen False _ = return ()
 
 
 processLine :: String -> ConvertT ()
@@ -129,6 +132,7 @@ processLine ('*':xs) = do
   processLine xs
 
 processLine (x:xs) = outChr x >> processLine xs
+
 
 -- .TH                Title
 -- .HS NAME           Name

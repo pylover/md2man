@@ -10,7 +10,6 @@ import Paths_md2man(version)
 data Args = Args
   { input :: FilePath
   , output :: FilePath
-  , name :: String
   , section :: Int
   , author :: String
   , email :: String
@@ -41,15 +40,6 @@ outputParser = strOption
  <> value "-"
  <> showDefaultWith (const "Standard Output")
  <> help "Output filename.")
-
-
-nameParser :: Parser String
-nameParser = strOption
-  ( long "name"
- <> metavar "NAME"
- <> value ""
- <> help "The name for manual page."
-  )
 
 
 sectionParser :: Parser Int
@@ -90,7 +80,6 @@ args :: Parser Args
 args = Args 
    <$> inputParser 
    <*> outputParser 
-   <*> nameParser
    <*> sectionParser
    <*> authorParser
    <*> emailParser

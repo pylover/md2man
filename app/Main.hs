@@ -15,8 +15,8 @@ import MD2Man
 
 main :: IO ()
 main = do
-  Args ifn ofn appname section author email <- parseArgs
-  let options = Options appname section author email
+  Args ifn ofn section author email <- parseArgs
+  let options = Options section author email
 
   withFile_ ifn ReadMode 
     (\i -> withFile_ ofn WriteMode 
