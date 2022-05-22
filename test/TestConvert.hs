@@ -107,4 +107,4 @@ test_convert_full = do
     \.SH QUX\n\
     \Qux is asesome\n\
     \.SH AUTHOR\n\
-    \Alice\n"
+    \Alice (alice@exmample.com)\n"

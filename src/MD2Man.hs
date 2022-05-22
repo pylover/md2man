@@ -4,8 +4,8 @@ module MD2Man
     ) where
 
 
-import Debug.Trace
 import System.IO 
+import Text.Printf
 import Control.Monad.State
 
 import Helpers
@@ -63,12 +63,14 @@ render i = do
 footer :: ConvertT ()
 footer = do
   opts <- gets options
-  printAuthor $ author opts
+  printAuthor (author opts) (email opts)
 
 
-printAuthor :: String -> ConvertT ()
-printAuthor "" = trace "empty author" $ return ()
-printAuthor a = trace ("author: " ++ a) $ outLn (".SH AUTHOR\n" ++ a)
+printAuthor :: String -> String -> ConvertT ()
+printAuthor "" "" = return ()
+printAuthor "" e = outLn $ ".SH AUTHOR\n" ++ e
+printAuthor a "" = outLn $ ".SH AUTHOR\n" ++ a
+printAuthor a e = outLn $ printf ".SH AUTHOR\n%s (%s)" a e
  
 
 loopLines :: Handle -> ConvertT ()
