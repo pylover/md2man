@@ -21,7 +21,11 @@ data Options = Options
   deriving (Eq, Show)
 
 
-data Status = Heading | Normal | Bold | Italic | Code
+data Style = Normal | Bold | Italic | Code
+  deriving (Eq, Show)
+
+
+data Status = Title | Section | FirstParagraph | Paragraph
   deriving (Eq, Show)
 
 
@@ -29,6 +33,7 @@ data ConState = ConState
   { options :: Options
   , outFile :: Handle
   , lineNo :: Int
+  , style :: Style
   , status :: Status
   }
   deriving (Eq, Show)
@@ -53,7 +58,7 @@ ifthen False _ = return ()
 
 
 convert :: Options -> Handle -> Handle -> IO ()
-convert opts i o = evalStateT (render i) (ConState opts o 1 Heading)
+convert opts i o = evalStateT (render i) (ConState opts o 1 Normal Title)
 
 
 render :: Handle -> ConvertT ()
@@ -85,28 +90,33 @@ loopLines i = do
     readLine = lift $ hGetLine i
 
 
+newStyle :: Style -> ConvertT ()
+newStyle s = modify' $ newS
+  where newS (ConState opts o l _ st) = ConState opts o l s st
+
+
 newStatus :: Status -> ConvertT ()
-newStatus s = modify' $ newS
-  where newS (ConState opts o l _) = ConState opts o l s
+newStatus st = modify' $ newS
+  where newS (ConState opts o l s _) = ConState opts o l s st
 
 
 nextLine :: ConState -> ConState
-nextLine (ConState opts o l s) = ConState opts o (l + 1) s
+nextLine (ConState opts o l s st) = ConState opts o (l + 1) s st
 
 
 feedLine :: String -> ConvertT ()
 
 -- Code
 feedLine ('`':'`':'`':xs) = do
-  s <- gets status
+  s <- gets style
   case s of 
-    Code -> outLn ".EE" >> newStatus Normal
-    _ -> outLn ".EX" >> newStatus Code
+    Code -> outLn ".EE" >> newStyle Normal
+    _ -> outLn ".EX" >> newStyle Code
 
 -- Section
 feedLine ('#':'#':xs) = do
   outLn $ ".SH " ++ (upper . trim $ xs)
-  newStatus Heading
+  newStatus Section
 
 -- Title
 feedLine ('#':xs) = do
@@ -118,35 +128,39 @@ feedLine ('#':xs) = do
     then outLn $ printf ".TH %s %d" u (section opts)
     else outLn $ printf ".TH %s %d %s %s %s man page" 
       u (section opts) (date opts) (version opts) t
-  newStatus Heading
+  newStatus Title
 
 -- Empty line
 feedLine "" = do
   s <- gets status
   case s of 
-    Heading -> return ()
-    _ -> outLn ".PP" >> newStatus Heading
+    FirstParagraph -> newStatus Paragraph
+    _ -> return ()
 
 -- Normal text
 feedLine xs = do
   s <- gets status
-  ifthen (s == Heading) $ newStatus Normal
+  case s of 
+    Paragraph -> outLn ".PP"
+    Title -> newStatus FirstParagraph
+    Section -> newStatus FirstParagraph
+    _ -> return () 
   processLine xs
 
 
 processLine :: String -> ConvertT ()
 processLine [] = outLn "" 
 processLine ('*':'*':xs) = do 
-  s <- gets status
+  s <- gets style
   case s of
     Bold -> out "\\fR"
-    _ -> out "\\fB" >> newStatus Bold
+    _ -> out "\\fB" >> newStyle Bold
   processLine xs
 processLine ('*':xs) = do 
-  s <- gets status
+  s <- gets style
   case s of
     Italic -> out "\\fR"
-    _ -> out "\\fI" >> newStatus Italic
+    _ -> out "\\fI" >> newStyle Italic
   processLine xs
 
 processLine (x:xs) = outChr x >> processLine xs
@@ -172,4 +186,3 @@ processLine (x:xs) = outChr x >> processLine xs
 -- .RS starts a relative margin indent: examples are more visually distinguishable if they’re indented.
 -- .RE ends the indent.
 -- \\ puts a backslash in the output. Since troff uses backslash for fonts and other in-line commands, it needs to be doubled in the manual page source so that the output has one.
-

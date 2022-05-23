@@ -64,6 +64,14 @@ test_convert_paragraph = do
   mini "#foo\n\
     \bar baz\n\
     \\n\
+    \##qux quux\n">>= assertEqual ".TH FOO 1\n\
+    \bar baz\n\
+    \.SH QUX QUUX\n"
+
+
+  mini "#foo\n\
+    \bar baz\n\
+    \\n\
     \qux quux\n">>= assertEqual ".TH FOO 1\n\
     \bar baz\n\
     \.PP\n\
