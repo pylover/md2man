@@ -151,6 +151,12 @@ printTitle t s d v b = outLn $ printf ".TH %s %d \"%s\" \"%s\" \"%s\"" t s d v b
 
 processLine :: String -> ConvertT ()
 processLine [] = outLn "" 
+processLine ('`':xs) = do 
+  s <- gets style
+  case s of
+    Bold -> out "\\fR"
+    _ -> out "\\fB" >> newStyle Bold
+  processLine xs
 processLine ('*':'*':xs) = do 
   s <- gets style
   case s of

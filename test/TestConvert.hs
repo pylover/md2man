@@ -105,6 +105,10 @@ test_convert_italic = do
   mini "* bar *" >>= assertEqual "\\fI bar \\fR\n"
 
 
+test_convert_backtick = do
+  mini "`foo bar`" >>= assertEqual "\\fBfoo bar\\fR\n"
+
+
 test_convert_full = do
   full "\
     \#foo\n\
