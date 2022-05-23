@@ -1,3 +1,5 @@
+-- https://liw.fi/manpages/
+-- https://www.markdownguide.org/basic-syntax/
 module MD2Man
     ( convert
     , Options(..)
