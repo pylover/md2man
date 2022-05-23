@@ -44,7 +44,7 @@ full = con fullOptions
 
 test_convert = do
   mini "" >>= assertEqual ""
-  mini "\n" >>= assertEqual ""
+  mini "\n" >>= assertEqual "\n"
 
 
 test_convert_title = do
@@ -60,7 +60,7 @@ test_convert_section = do
 test_convert_paragraph = do
   mini "#foo\n\
     \\n\
-    \\n" >>= assertEqual ".TH FOO 1\n"
+    \\n" >>= assertEqual ".TH FOO 1\n\n\n"
 
   mini "#foo\n\
     \bar baz\n\
@@ -85,6 +85,8 @@ test_convert_paragraph = do
     \\n\
     \qux quux\n">>= assertEqual ".TH FOO 1\n\
     \bar baz\n\
+    \\n\
+    \\n\
     \.PP\n\
     \qux quux\n"
 
@@ -103,10 +105,12 @@ test_convert_bold = do
 
 test_convert_italic = do
   mini "* bar *" >>= assertEqual "\\fI bar \\fR\n"
+  mini "\\* bar \\*" >>= assertEqual "* bar *\n"
 
 
 test_convert_backtick = do
   mini "`foo bar`" >>= assertEqual "\\fBfoo bar\\fR\n"
+  mini "`foo *bar*`" >>= assertEqual "\\fBfoo *bar*\\fR\n"
 
 
 test_convert_full = do

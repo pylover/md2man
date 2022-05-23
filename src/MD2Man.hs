@@ -22,7 +22,7 @@ data Options = Options
   deriving (Eq, Show)
 
 
-data Style = Normal | Bold | Italic | Code
+data Style = Normal | Bold | Italic | Code | Backtick
   deriving (Eq, Show)
 
 
@@ -133,10 +133,13 @@ eatLine _ _ ('#':xs) = do
 
 -- Empty line
 eatLine FirstParagraph _ "" = newStatus Paragraph
-eatLine _ _ "" = return ()
+eatLine _ _ "" = outLn ""
 
 -- Normal text
-eatLine Paragraph _ xs = outLn ".PP" >> processLine xs
+eatLine Paragraph _ xs = do
+  outLn ".PP"
+  newStatus FirstParagraph
+  processLine xs
 eatLine Title _ xs = newStatus FirstParagraph >> processLine xs
 eatLine Section _ xs = newStatus FirstParagraph >> processLine xs
 eatLine _ _ xs = processLine xs
@@ -151,21 +154,25 @@ printTitle t s d v b = outLn $ printf ".TH %s %d \"%s\" \"%s\" \"%s\"" t s d v b
 
 processLine :: String -> ConvertT ()
 processLine [] = outLn "" 
+processLine ('\\':'*':xs) = outChr '*' >> processLine xs
+processLine ('\\':'`':xs) = outChr '`' >> processLine xs
 processLine ('`':xs) = do 
   s <- gets style
   case s of
-    Bold -> out "\\fR"
-    _ -> out "\\fB" >> newStyle Bold
+    Backtick -> out "\\fR" >> newStyle Normal
+    _ -> out "\\fB" >> newStyle Backtick
   processLine xs
 processLine ('*':'*':xs) = do 
   s <- gets style
   case s of
-    Bold -> out "\\fR"
+    Backtick -> out "**"
+    Bold -> out "\\fR" >> newStyle Normal
     _ -> out "\\fB" >> newStyle Bold
   processLine xs
 processLine ('*':xs) = do 
   s <- gets style
   case s of
+    Backtick -> outChr '*'
     Italic -> out "\\fR"
     _ -> out "\\fI" >> newStyle Italic
   processLine xs
