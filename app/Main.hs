@@ -11,13 +11,15 @@ import System.IO
 
 import CLI
 import MD2Man
+import Helpers
 
 
 main :: IO ()
 main = do
   Args ifn ofn section author email <- parseArgs
-  let options = Options section author email
-
+  d <- today
+  let options = Options section author email d
+  
   withFile_ ifn ReadMode 
     (\i -> withFile_ ofn WriteMode 
       (\o -> convert options i o))

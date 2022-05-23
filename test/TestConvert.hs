@@ -18,8 +18,8 @@ packStr :: String -> ByteString
 packStr = encodeUtf8 . T.pack
 
 
-minimalOptions = Options 1 "" ""
-fullOptions = Options 1 "Alice" "alice@exmample.com"
+minimalOptions = Options 1 "" "" ""
+fullOptions = Options 1 "Alice" "alice@exmample.com" "1 Jan 2020"
 
 
 con :: Options -> String -> IO String
@@ -107,7 +107,7 @@ test_convert_full = do
     \  printf(\"Hello\"\n\
     \}\n\
     \```" >>= assertEqual "\
-    \.TH FOO 1\n\
+    \.TH FOO 1 1 Jan 2020\n\
     \bar baz\n\
     \.SH QUX\n\
     \Qux is asesome\n\

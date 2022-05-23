@@ -1,1 +1,1 @@
-.TH ... Time revision and book name
+.TH ... version and book name

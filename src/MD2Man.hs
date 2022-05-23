@@ -15,6 +15,7 @@ data Options = Options
   { section :: Int
   , author :: String
   , email :: String
+  , date :: String
   }
   deriving (Eq, Show)
 
@@ -108,7 +109,12 @@ feedLine ('#':'#':xs) = do
 
 -- Title
 feedLine ('#':xs) = do
-  outLn $ ".TH " ++ (upper . trim $ xs) ++ " " ++  show 1
+  opts <- gets options
+  let d = date opts
+      t = upper . trim $ xs
+  if d == ""
+    then outLn $ printf ".TH %s %d" t (section opts)
+    else outLn $ printf ".TH %s %d %s" t (section opts) (date opts)
   newStatus Heading
 
 -- Empty line

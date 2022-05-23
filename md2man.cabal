@@ -35,6 +35,7 @@ library
       base >=4.7 && <5
     , mtl
     , optparse-applicative
+    , time
   default-language: Haskell2010
 
 executable md2man
@@ -50,6 +51,7 @@ executable md2man
     , md2man
     , mtl
     , optparse-applicative
+    , time
   default-language: Haskell2010
 
 test-suite test-convert
@@ -69,4 +71,5 @@ test-suite test-convert
     , mtl
     , optparse-applicative
     , text
+    , time
   default-language: Haskell2010
