@@ -33,11 +33,13 @@ if [ -d $WORKING_DIR ]; then
 fi
 
 mkdir -p $WORKING_DIR/usr/local/bin
+mkdir -p $WORKING_DIR/usr/share/man/man1
 mkdir -p $WORKING_DIR/DEBIAN
 
 # Copy the binary
 cp $EXECFILE $WORKING_DIR/usr/local/bin
 
+# Control file
 echo "\
 Package: ${APP_NAME}
 Version: ${APP_VERSION}
@@ -54,6 +56,13 @@ echo "Source:" >> debian/control
 dpkg-shlibdeps -O usr/local/bin/md2man >> DEBIAN/control
 rm -rf debian
 cd ..
+
+# Manual page
+cd ../man
+make clean md2man.1
+cd ../deb
+cp ../man/md2man.1 $WORKING_DIR/usr/share/man/man1
+
 
 # Build
 dpkg-deb --build --root-owner-group $WORKING_DIR
