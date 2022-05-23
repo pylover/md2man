@@ -16,10 +16,3 @@ $HERE/md2man \
   -o $DEST $SRC
 
 man $DEST
-
-# ```man
- 
-
- 
- 
-# ```
