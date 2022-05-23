@@ -16,9 +16,9 @@ import Helpers
 
 main :: IO ()
 main = do
-  Args ifn ofn section author email ver <- parseArgs
+  Args ifn ofn section author email ver book <- parseArgs
   d <- today
-  let options = Options section author email d ver
+  let options = Options section author email d ver book
   
   withFile_ ifn ReadMode 
     (\i -> withFile_ ofn WriteMode 

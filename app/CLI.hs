@@ -13,7 +13,8 @@ data Args = Args
   , section :: Int
   , author :: String
   , email :: String
-  , appVersion :: String
+  , revision :: String
+  , book :: String
   }
   deriving Show
 
@@ -53,13 +54,22 @@ sectionParser = option auto
   )
 
 
-appVersionParser :: Parser String
-appVersionParser = strOption
-  ( long "app-version"
- <> metavar "VERSION"
+revisionParser :: Parser String
+revisionParser = strOption
+  ( long "revision"
+ <> metavar "REVISION"
+ <> value ""
+ <> help "Application revision"
+  )
+
+
+bookParser :: Parser String
+bookParser = strOption
+  ( long "book"
+ <> metavar "BOOKNAME"
  <> showDefault
  <> value ""
- <> help "Application version"
+ <> help "GNU Book Name"
   )
 
 
@@ -94,7 +104,8 @@ args = Args
    <*> sectionParser
    <*> authorParser
    <*> emailParser
-   <*> appVersionParser
+   <*> revisionParser
+   <*> bookParser
 
 
 parseArgs :: IO Args

@@ -17,6 +17,7 @@ data Options = Options
   , email :: String
   , date :: String
   , version :: String
+  , book :: String
   }
   deriving (Eq, Show)
 
@@ -121,13 +122,8 @@ feedLine ('#':'#':xs) = do
 -- Title
 feedLine ('#':xs) = do
   opts <- gets options
-  let d = date opts
-      t = trim xs
-      u = upper t
-  if d == ""
-    then outLn $ printf ".TH %s %d" u (section opts)
-    else outLn $ printf ".TH %s %d %s %s %s man page" 
-      u (section opts) (date opts) (version opts) t
+  printTitle (upper (trim xs)) (section opts) (date opts) (version opts) 
+    (book opts)
   newStatus Title
 
 -- Empty line
@@ -146,6 +142,13 @@ feedLine xs = do
     Section -> newStatus FirstParagraph
     _ -> return () 
   processLine xs
+
+
+printTitle :: String -> Int -> String -> String -> String -> ConvertT ()
+printTitle t s "" "" "" = outLn $ printf ".TH %s %d" t s
+printTitle t s d "" "" = outLn $ printf ".TH %s %d \"%s\"" t s d
+printTitle t s d v "" = outLn $ printf ".TH %s %d \"%s\" \"%s\"" t s d v
+printTitle t s d v b = outLn $ printf ".TH %s %d \"%s\" \"%s\" \"%s\"" t s d v b
 
 
 processLine :: String -> ConvertT ()

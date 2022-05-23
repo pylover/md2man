@@ -14,7 +14,7 @@ import Data.Time
 today :: IO String
 today = do
   now <- getCurrentTime
-  return $ formatTime defaultTimeLocale "%d %b %Y" now
+  return $ formatTime defaultTimeLocale "%Y-%m-%d" now
 
 
 trim :: String -> String

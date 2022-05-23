@@ -18,8 +18,9 @@ packStr :: String -> ByteString
 packStr = encodeUtf8 . T.pack
 
 
-minimalOptions = Options 1 "" "" "" ""
-fullOptions = Options 1 "Alice" "alice@exmample.com" "1 Jan 2020" "0.1.2.3"
+minimalOptions = Options 1 "" "" "" "" ""
+fullOptions = Options 1 "Alice" "alice@exmample.com" "2020-1-1" "0.1.2.3"
+  "Foo Bar Book"
 
 
 con :: Options -> String -> IO String
@@ -115,7 +116,7 @@ test_convert_full = do
     \  printf(\"Hello\"\n\
     \}\n\
     \```" >>= assertEqual "\
-    \.TH FOO 1 1 Jan 2020 0.1.2.3 foo man page\n\
+    \.TH FOO 1 \"2020-1-1\" \"0.1.2.3\" \"Foo Bar Book\"\n\
     \bar baz\n\
     \.SH QUX\n\
     \Qux is asesome\n\
