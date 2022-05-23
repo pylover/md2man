@@ -6,7 +6,7 @@ cabal-version: 1.12
 
 name:           md2man
 version:        0.1.0.0
-description:    Please see the README on GitHub at <https://github.com/githubuser/md2man#readme>
+description:    A simple Unix manual generator from markdown.
 homepage:       https://github.com/pylover/md2man#readme
 bug-reports:    https://github.com/pylover/md2man/issues
 author:         Vahid Mardani

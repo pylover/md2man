@@ -94,7 +94,6 @@ emailParser = strOption
 appInfo :: InfoMod s
 appInfo = fullDesc
        <> progDesc "Generate Unix manual from markdown."
-       <> header "Generate column based text editor"
 
 
 args :: Parser Args
