@@ -3,7 +3,7 @@
 
 HERE=`dirname "$(readlink -f "$BASH_SOURCE")"`
 SRC=$HERE/strdup.md
-DEST="${SRC%.*}.3"
+DEST="${SRC%.*}.3.man"
 
 
 stack install --local-bin-path $HERE $APP_PATH

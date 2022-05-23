@@ -112,6 +112,8 @@ test_convert_full = do
     \## Qux\n\
     \Qux is asesome\n\
     \```bash\n\
+    \#include <stdio.h>\n\
+    \\n\
     \void main() {\n\
     \  printf(\"Hello\"\n\
     \}\n\
@@ -120,10 +122,14 @@ test_convert_full = do
     \bar baz\n\
     \.SH QUX\n\
     \Qux is asesome\n\
+    \\n\
     \.EX\n\
+    \#include <stdio.h>\n\
+    \\n\
     \void main() {\n\
     \  printf(\"Hello\"\n\
     \}\n\
     \.EE\n\
+    \\n\
     \.SH AUTHOR\n\
     \Alice (alice@exmample.com)\n"

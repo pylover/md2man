@@ -106,42 +106,40 @@ nextLine (ConState opts o l s st) = ConState opts o (l + 1) s st
 
 
 feedLine :: String -> ConvertT ()
+feedLine l = do
+  st <- gets status
+  s <- gets style
+  eatLine st s l
+
+
+eatLine :: Status -> Style -> String -> ConvertT ()
 
 -- Code
-feedLine ('`':'`':'`':xs) = do
-  s <- gets style
-  case s of 
-    Code -> outLn ".EE" >> newStyle Normal
-    _ -> outLn ".EX" >> newStyle Code
+eatLine _ Code ('`':'`':'`':xs) = outLn ".EE\n" >> newStyle Normal
+eatLine _ _ ('`':'`':'`':xs) = outLn "\n.EX" >> newStyle Code
+eatLine _ Code xs = outLn xs
 
 -- Section
-feedLine ('#':'#':xs) = do
+eatLine _ _ ('#':'#':xs) = do
   outLn $ ".SH " ++ (upper . trim $ xs)
   newStatus Section
 
 -- Title
-feedLine ('#':xs) = do
+eatLine _ _ ('#':xs) = do
   opts <- gets options
   printTitle (upper (trim xs)) (section opts) (date opts) (version opts) 
     (book opts)
   newStatus Title
 
 -- Empty line
-feedLine "" = do
-  s <- gets status
-  case s of 
-    FirstParagraph -> newStatus Paragraph
-    _ -> return ()
+eatLine FirstParagraph _ "" = newStatus Paragraph
+eatLine _ _ "" = return ()
 
 -- Normal text
-feedLine xs = do
-  s <- gets status
-  case s of 
-    Paragraph -> outLn ".PP"
-    Title -> newStatus FirstParagraph
-    Section -> newStatus FirstParagraph
-    _ -> return () 
-  processLine xs
+eatLine Paragraph _ xs = outLn ".PP" >> processLine xs
+eatLine Title _ xs = newStatus FirstParagraph >> processLine xs
+eatLine Section _ xs = newStatus FirstParagraph >> processLine xs
+eatLine _ _ xs = processLine xs
 
 
 printTitle :: String -> Int -> String -> String -> String -> ConvertT ()
