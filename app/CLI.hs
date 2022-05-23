@@ -13,6 +13,7 @@ data Args = Args
   , section :: Int
   , author :: String
   , email :: String
+  , appVersion :: String
   }
   deriving Show
 
@@ -52,6 +53,16 @@ sectionParser = option auto
   )
 
 
+appVersionParser :: Parser String
+appVersionParser = strOption
+  ( long "app-version"
+ <> metavar "VERSION"
+ <> showDefault
+ <> value ""
+ <> help "Application version"
+  )
+
+
 authorParser :: Parser String
 authorParser = strOption
   ( long "author"
@@ -83,6 +94,7 @@ args = Args
    <*> sectionParser
    <*> authorParser
    <*> emailParser
+   <*> appVersionParser
 
 
 parseArgs :: IO Args
