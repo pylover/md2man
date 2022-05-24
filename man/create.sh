@@ -36,7 +36,7 @@ echo "# md2man
 
 ${SYN}
 
-## Description
+## Options
 
 ${DESC}
 

@@ -1,7 +1,13 @@
 # Foo
 
-Foo is an awesome package.
+`Foo` is an awesome package.
 
-## bar
+## Synopsis
 
-Bar is sub foo.
+foo [-V/--version] [-v/--verbose] FILENAME
+
+## Bar
+
+Bar is awesome too.
+
+
