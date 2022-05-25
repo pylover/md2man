@@ -6,8 +6,8 @@ Convert markdown to Unix manual page.
 
 ### Debian
 
-Download the debian package form the [latest release on github]
-(https://github.com/pylover/md2man/releases/latest)
+Download the debian package form the [latest release on github](
+https://github.com/pylover/md2man/releases/latest)
 
 ```bash
 sudo dpkg -i md2man_*-amd64.deb
