@@ -51,5 +51,6 @@ make clean build
 Update version inside `package.yaml` and run:
 
 ```bash
+stack test
 ./release.sh
 ```
