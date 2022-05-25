@@ -44,3 +44,12 @@ md2man --help
 cd deb
 make clean build
 ```
+
+
+#### Github release
+
+Update version inside `package.yaml` and run:
+
+```bash
+./release.sh
+```
